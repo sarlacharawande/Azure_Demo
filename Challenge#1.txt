@@ -1,0 +1,146 @@
+Challenge #1
+A 3-tier environment is a common setup. Use a tool of your choosing/familiarity create these resources on a cloud environment (Azure).
+
+Answer:
+  Creating a 3-tier environment on Azure involves provisioning and configuring the necessary Azure resources to support each tier, ensuring connectivity and
+ communication between them, and deploying the application components accordingly. This setup enables scalability, reliability, and separation of concerns,
+ making it easier to manage and maintain complex applications in the cloud.
+  
+ 3 tiers are:
+  1. Presentation layer
+  2. Application layer
+  3. Data layer
+
+Some approch to consider while working on 3-ier environment-
+
+1. Understanding the Requirements: Start by understanding the components and requirements of a 3-tier environment. 
+2. Selecting the Tool: Choose a tool you're familiar with for provisioning infrastructure on Azure. 
+3. Designing the Infrastructure: Based on the requirements, design the infrastructure components for each tier.
+4. Writing Infrastructure as Code (IaC): Use the selected tool to write infrastructure as code (IaC) to provision the Azure resources.
+5. Organizing the Code: Structure the code in a modular and reusable way, separating the configuration for each tier into separate files or modules.
+6. Parameterization and Variables: Parameterize the infrastructure code to make it customizable and reusable across different environments. 
+7. Implementing Best Practices: Follow best practices for cloud infrastructure provisioning, such as using resource tags for organization and cost tracking, implementing security controls, and optimizing resource utilization.
+8. Testing and Validation: Test the infrastructure code locally using tools like Azure DevOps Pipeline or Terraform's plan feature to detect any syntax errors or misconfigurations before deployment.
+9. Deployment and Automation: Automate the deployment process using continuous integration/continuous deployment (CI/CD) pipelines or automation scripts. 
+10.Documentation and Collaboration: Document the infrastructure code, including the purpose of each resource, dependencies, and any special configurations.
+11.Version Control: Use version control systems like Git to manage the infrastructure code, track changes, and facilitate collaboration. 
+12.Feedback and Iteration: Gather feedback from stakeholders and incorporate any necessary changes or improvements to the infrastructure code.
+
+
+Now...
+Here's how we can use Terraform to create a 3-tier environment on Azure:
+
+1.Define Infrastructure Components:
+# main.tf
+
+# Define Azure provider
+provider "azurerm" {
+  features {}
+}
+
+# Create a resource group
+resource "azurerm_resource_group" "RGresource" {
+  name     = "RGresource-resources"
+  location = "East US"
+}
+
+
+2.Provision Networking Resources:
+# network.tf
+
+# Create virtual network
+resource "azurerm_virtual_network" "wvn-vnet" {
+  name                = "wvn-vnet-network"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.RGresource.location
+  resource_group_name = azurerm_resource_group.RGresource.name
+}
+
+# Create subnets
+resource "azurerm_subnet" "presentation_subnet" {
+  name                 = "presentation-subnet"
+  resource_group_name  = azurerm_resource_group.RGresource.name
+  virtual_network_name = azurerm_virtual_network.RGresource.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+3.Provision Compute Resources
+# compute.tf
+
+# Create virtual machine for presentation tier
+resource "azurerm_virtual_machine" "DevOps-vm" {
+  name                  = "DevOps-vm"
+  resource_group_name   = azurerm_resource_group.RGresource.name
+  location              = azurerm_resource_group.RGresource.location
+  availability_set_id   = azurerm_availability_set.example.id
+  network_interface_ids = [azurerm_network_interface.presentation.id]
+
+  vm_size              = "Standard_DS2_v2"
+  delete_os_disk_on_termination = true
+
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+
+  os_profile {
+    computer_name  = "presentation-vm"
+    admin_username = "adminuser"
+    admin_password = "Password1234!"
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
+  }
+}
+
+4. Deploy Application code
+
+# application_deploy.tf
+
+# Example of deploying application using custom script extension
+resource "azurerm_virtual_machine_extension" "example" {
+  name                 = "app-deploy"
+  virtual_machine_id   = azurerm_virtual_machine.presentation_vm.id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.1"
+
+  settings = jsonencode({
+    commandToExecute = "bash /path/to/deploy_script.sh"
+  })
+}
+
+
+5. Manage Secuirity & access control
+# security.tf
+
+# Create network security group
+resource "azurerm_network_security_group" "example" {
+  name                = "example-nsg"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+
+  security_rule {
+    name                       = "http-rule"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+
+6.Deploy & Manage resources
+# Terminal commands
+
+terraform init
+terraform plan
+terraform apply
