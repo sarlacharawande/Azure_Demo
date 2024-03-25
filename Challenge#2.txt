@@ -1,0 +1,63 @@
+Challenge#2-
+We need to write code that will query the meta data of an instance within Azure 
+and provide a json formatted output.
+
+Answer:
+  The term "querying metadata of an instance within AWS, Azure, or GCP" refers to retrieving information about the virtual 
+machine or instance where your code is running from the cloud provider's metadata service. This metadata includes details 
+such as instance ID, hostname, IP address, region, availability zone, and more.
+
+# Microsoft.Compute/virtualMachines/extensions is the API version for the VM extension
+# It allows running custom script on the VM for querying metadata
+apiVersion: '2019-12-01'
+type: 'Microsoft.Compute/virtualMachines/extensions'
+name: 'InstanceMetadataQuery'
+location: '[Azure-Region]'
+properties:
+  publisher: 'Microsoft.Azure.Extensions'
+  type: 'CustomScript'
+  typeHandlerVersion: '2.1'
+  autoUpgradeMinorVersion: true
+  settings:
+    fileUris: 
+      - '[URL to your script file]'  # URL to the script file that queries metadata
+  protectedSettings:
+    commandToExecute: 'bash script.sh'  # Command to execute the script
+
+
+
+If you prefer to use YAML for defining the infrastructure as code and querying metadata within Azure, you can utilize Azure Resource Manager (ARM) templates. ARM templates allow you to describe the infrastructure and resources needed for your application in YAML or JSON format.
+
+Below is an example of an ARM template in YAML format that queries instance metadata within Azure and provides JSON-formatted output:
+
+yaml
+Copy code
+# Microsoft.Compute/virtualMachines/extensions is the API version for the VM extension
+# It allows running custom script on the VM for querying metadata
+apiVersion: '2019-12-01'
+type: 'Microsoft.Compute/virtualMachines/extensions'
+name: 'InstanceMetadataQuery'
+location: '[Azure-Region]'
+properties:
+  publisher: 'Microsoft.Azure.Extensions'
+  type: 'CustomScript'
+  typeHandlerVersion: '2.1'
+  autoUpgradeMinorVersion: true
+  settings:
+    fileUris: 
+      - '[URL to your script file]'  # URL to the script file that queries metadata
+  protectedSettings:
+    commandToExecute: 'bash script.sh'  # Command to execute the script
+
+
+
+In this YAML template:
+
+apiVersion specifies the version of the Azure API being used.
+type and name define the resource type and name of the Azure VM extension.
+location specifies the Azure region where the virtual machine resides.
+properties contain the configuration details of the VM extension.
+publisher, type, and typeHandlerVersion specify the extension details for running a custom script on the VM.
+autoUpgradeMinorVersion indicates whether to automatically upgrade to the minor version of the extension.
+settings include the URLs of the script file that queries metadata.
+protectedSettings contain the command to execute the script (in this case, a Bash script).
