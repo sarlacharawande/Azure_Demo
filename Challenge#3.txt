@@ -1,0 +1,40 @@
+Challenge #3
+We have a nested object. We would like a function where you pass in the object and a key and
+get back the value.
+
+Example Inputs
+object = {“a”:{“b”:{“c”:”d”}}}
+key = a/b/c
+value = d
+object = {“x”:{“y”:{“z”:”a”}}}
+key = x/y/z
+value = a
+
+Answer:
+
+def get_Nested_value(nestedObj, key):
+    keys = key.split('/') 
+    currentObj = nestedObj 
+
+    
+    for keyitem in keys:
+        if keyitem in currentObj:
+            currentObj = currentObj[keyitem]
+        else:
+            return None 
+
+    return currentObj
+
+# Example usage:
+nested_object1 = {"a": {"b": {"c": "d"}}}
+nested_object2 = {"x": {"y": {"z": "a"}}}
+
+key1 = "a/b/c"
+key2 = "x/y/z"
+
+# Call the function with the nested object and key
+value1 = get_Nested_value(nested_object1, key1)
+value2 = get_Nested_value(nested_object2, key2)
+
+print("Value for key '{}' in nested_object1: {}".format(key1, value1))
+print("Value for key '{}' in nested_object2: {}".format(key2, value2))
