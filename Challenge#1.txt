@@ -52,7 +52,7 @@ resource "azurerm_resource_group" "RGresource" {
 resource "azurerm_virtual_network" "wvn-vnet" {
   name                = "wvn-vnet-network"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.RGresource.location
+  location            = "East US"
   resource_group_name = azurerm_resource_group.RGresource.name
 }
 
@@ -71,7 +71,7 @@ resource "azurerm_subnet" "presentation_subnet" {
 resource "azurerm_virtual_machine" "DevOps-vm" {
   name                  = "DevOps-vm"
   resource_group_name   = azurerm_resource_group.RGresource.name
-  location              = azurerm_resource_group.RGresource.location
+  location              = "East US"
   availability_set_id   = azurerm_availability_set.example.id
   network_interface_ids = [azurerm_network_interface.presentation.id]
 
